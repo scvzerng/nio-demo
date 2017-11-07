@@ -21,6 +21,7 @@ public class NioServer extends Thread {
             while (true){
                 SocketChannel channel = serverSocket.accept();
                 if(channel!=null){
+                    channel.configureBlocking(false);
                     System.out.println(channel.getLocalAddress().toString()+"connected");
                     service.submit(()-> new Worker(channel).process());
                 }

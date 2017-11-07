@@ -14,24 +14,31 @@ public class Worker {
         this.channel = channel;
     }
     public void process(){
-        while (channel.isConnected()){
-            try {
-                    StringBuilder string = new StringBuilder();
-                    while (channel.read(buffer)!=-1){
-                        string.append(new String(buffer.array()));
-                        buffer.clear();
+        try {
+            while (true){
+                buffer.clear();
+                int count = channel.read(buffer);
+                    if(count==0){
+                        Thread.sleep(100);
+                        continue;
                     }
+                    if(count==-1){
+                        channel.close();
+                        System.out.println("close");
 
-                System.out.println(string);
+                        return;
+                    }
+                    StringBuilder string = new StringBuilder();
+                    string.append(new String(buffer.array()));
+                    buffer.clear();
+                    System.out.println(Thread.currentThread().getId()+""+string);
 
-
-            } catch (IOException e) {
-                try {
-                    channel.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

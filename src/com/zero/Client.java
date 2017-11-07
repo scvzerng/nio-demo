@@ -11,19 +11,21 @@ public class Client {
         SocketChannel channel = SocketChannel.open();
         channel.configureBlocking(false);
         channel.connect(new InetSocketAddress("127.0.0.1",9999));
-        channel.finishConnect();
-        while (true){
-            Scanner scanner = new Scanner(System.in);
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            String input = scanner.next();
-            buffer.put(input.getBytes());
-            buffer.flip();
-            while (buffer.hasRemaining()){
-                channel.write(buffer);
+            while (channel.finishConnect()){
+                Scanner scanner = new Scanner(System.in);
+                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                String input = scanner.next();
+                if(input.equals("exit")) {
+                    channel.close();
+                    return;
+                }
+                buffer.put(input.getBytes());
+                buffer.flip();
+                while (buffer.hasRemaining()){
+                    channel.write(buffer);
+                }
+                buffer.clear();
             }
-            buffer.clear();
-        }
-
 
 
     }
