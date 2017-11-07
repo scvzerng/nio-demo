@@ -14,7 +14,7 @@ public class Worker {
         this.channel = channel;
     }
     public void process(){
-        while (channel.isOpen()){
+        while (channel.isConnected()){
             try {
                     StringBuilder string = new StringBuilder();
                     while (channel.read(buffer)!=-1){
@@ -22,8 +22,15 @@ public class Worker {
                         buffer.clear();
                     }
 
+                System.out.println(string);
+
+
             } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    channel.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
     }
