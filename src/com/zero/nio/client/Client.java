@@ -1,4 +1,4 @@
-package com.zero;
+package com.zero.nio.client;
 
 import java.io.IOException;
 import java.net.*;

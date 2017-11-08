@@ -1,4 +1,5 @@
-package com.zero;
+package com.zero.nio.server;
+
 
 import java.io.IOException;
 import java.net.*;
@@ -19,14 +20,15 @@ public class NioServer extends Thread {
             serverSocket.bind(new InetSocketAddress(9999));
             serverSocket.configureBlocking(false);
             while (true){
+                Thread.sleep(1);
+                //非阻塞
                 SocketChannel channel = serverSocket.accept();
                 if(channel!=null){
                     channel.configureBlocking(false);
-                    System.out.println(channel.getLocalAddress().toString()+"connected");
-                    service.submit(()-> new Worker(channel).process());
+                    service.submit(new Worker(channel));
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
