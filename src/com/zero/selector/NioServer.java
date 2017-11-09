@@ -83,15 +83,15 @@ public class NioServer extends Thread {
     private void handlerReader(SelectionKey event) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(64);
         SocketChannel channel = (SocketChannel) event.channel();
-        StringBuilder result = getOrDefault(channel);
+        StringBuilder store = channelData.get(channel);
         int count;
         while ((count = channel.read(buffer)) > 0) {
             buffer.flip();
             byte[] contents = new byte[buffer.limit()];
             buffer.get(contents, 0, buffer.limit());
-            result.append(new String(contents));
+            store.append(new String(contents));
             buffer.clear();
-            System.out.println("receiving:" + result.toString());
+            System.out.println("receiving:" + store.toString());
         }
         if (count == -1) {
             //数据读取完毕  客户端正常退出
@@ -116,16 +116,8 @@ public class NioServer extends Thread {
      * @param channel
      * @return
      */
-    private StringBuilder getOrDefault(SocketChannel channel) {
-        StringBuilder builder = channelData.get(channel);
-        if (builder == null) {
-            synchronized (this) {
-                builder = new StringBuilder();
-                channelData.put(channel, builder);
-                builder = channelData.get(channel);
-            }
-        }
-        return builder;
+    private void initDataStore(SocketChannel channel) {
+                channelData.put(channel, new StringBuilder());
     }
 
     /**
@@ -140,6 +132,7 @@ public class NioServer extends Thread {
         if (client != null) {
             client.configureBlocking(false);
             client.register(selector, SelectionKey.OP_READ);
+            initDataStore(client);
         }
     }
 
